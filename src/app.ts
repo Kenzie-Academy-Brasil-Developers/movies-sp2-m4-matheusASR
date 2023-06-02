@@ -1,16 +1,19 @@
-import express, { json } from 'express';
 import 'dotenv/config'
+import express, { Application, json } from 'express';
 import { createMovie, deleteMovie, getMovieById, getMovies, updateMovie } from './logic';
 import { categoryExist, idExist, nameExist } from './middlewares';
+import { startDatabase } from './database';
 
-const app = express();
+const app: Application = express();
 app.use(json());
 
-const PORT: number = 3000;
-app.listen(PORT, () => console.log('Server is running'));
-// console.log(process.env.PORT);
+app.listen(process.env.PORT, async () => {
+    await startDatabase()
+    console.log('Server is running')
+});
 
-app.post('/movies', nameExist,createMovie)
+app.post('/movies', createMovie)
+//nameExist
 app.get('/movies', getMovies)
 app.get('/movies/:category', categoryExist)
 app.get('/movies/:id', idExist,getMovieById)

@@ -1,3 +1,5 @@
+import { QueryResult } from "pg";
+
 interface IMovies {
     id: number;
     name: string;
@@ -8,6 +10,7 @@ interface IMovies {
 
 type TMoviesRequest = Omit<IMovies, "id">;
 type TMoviesUpdateRequest = Partial<TMoviesRequest>
+type TMoviesResult = QueryResult<IMovies>
 
 
-export { IMovies, TMoviesRequest, TMoviesUpdateRequest}
+export { IMovies, TMoviesRequest, TMoviesUpdateRequest, TMoviesResult }
