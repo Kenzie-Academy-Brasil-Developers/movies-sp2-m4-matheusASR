@@ -1,5 +1,5 @@
 import { Request, Response } from "express"
-import { TMoviesRequest, TMoviesResult } from "./interfaces"
+import { IMovies, TMoviesRequest, TMoviesResult } from "./interfaces"
 import format from "pg-format";
 import { client } from "./database";
 
@@ -22,20 +22,25 @@ const getMovies = async (req: Request, res: Response): Promise<Response> => {
     return res.status(200).json(queryResult.rows)
 }
 
-const getMoviesByCategory = async (req: Request, res: Response): Promise<Response> => {
-    return res
-}
-
 const getMovieById = async (req: Request, res: Response): Promise<Response> => {
-    return res
+    return res.status(200).json(res.locals.foundMovie)
 }
 
 const updateMovie = async (req: Request, res: Response): Promise<Response> => {
-    return res
+    const queryFormat: string = format(
+        "UPDATE movies SET (%I) = ROW (%L) WHERE id = $1 RETURNING *;",
+        Object.keys(req.body),
+        Object.values(req.body),
+    )
+
+    const queryResult: TMoviesResult = await client.query(queryFormat, [req.params.id]) 
+
+    return res.status(200).json(queryResult.rows[0])
 }
 
 const deleteMovie = async (req: Request, res: Response): Promise<Response> => {
-    return res
+    await client.query("DELETE FROM movies WHERE id = $1", [req.params.id])
+    return res.status(204).json()
 }
 
 export {
@@ -44,5 +49,4 @@ export {
     getMovieById,
     updateMovie,
     deleteMovie,
-    getMoviesByCategory
 }
