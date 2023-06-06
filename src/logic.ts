@@ -12,12 +12,23 @@ const createMovie = async (req: Request, res: Response): Promise<Response> => {
       );
     const queryResult: TMoviesResult = await client.query(queryFormat);
 
-    return res.status(201).json(queryResult.rows);
+    return res.status(201).json(queryResult.rows[0]);
 }
 
 const getMovies = async (req: Request, res: Response): Promise<Response> => {
     const queryString: string = "SELECT * FROM movies;"
     const queryResult: TMoviesResult = await client.query(queryString)
+    const { category } = req.query;
+    const queryResult1: TMoviesResult = await client.query(
+        "SELECT * FROM movies WHERE category = $1;",
+        [category]
+      );
+    
+    const moviesByCategory: IMovies[] = queryResult1.rows;
+
+    if(moviesByCategory.length > 0) {
+    return res.status(200).json(moviesByCategory);
+    } 
 
     return res.status(200).json(queryResult.rows)
 }
